@@ -21,20 +21,42 @@
 	];
 
 	let id = 0;
-	let temp = '';
+	let temp: Boolean;
+	let input = '';
 
 	const check = (answer: string) => {
-		answer === tasks[id].solution ? (temp = 'correct') : (temp = 'falsch');
+		answer === tasks[id].solution ? (temp = true) : (temp = false);
+		input = answer;
+		clearInterval(myTimer);
+		value = 100;
 	};
 
+	let myTimer;
+	let value = 100;
+
+	$: timeOut = () => {
+		value === 0 ? clearInterval(myTimer) : null;
+		value = 100;
+	};
 	const next = () => {
 		id++;
-		temp = '';
+		temp = null;
+		input=''
+		myTimer = setInterval(() => value--, 100);
 	};
 </script>
 
-<div class="">
-	<div>{tasks[id].task}</div>
-	<div>{temp}</div>
+<div class="flex flex-col">
+	<progress class="progress progress-primary w-4/5 mx-auto my-4" {value} max="100" />
+	<div class="h-1/2 flex flex-col">
+		<div class="text-6xl m-auto grow">
+			{tasks[id].task} = {input}
+			{#if temp}
+				<span>✅</span>
+			{:else if temp===false}
+				<span>🚫</span>
+			{/if}
+		</div>
+	</div>
 	<Keypad on:answer={(e) => check(e.detail.text)} on:next={next} />
 </div>
